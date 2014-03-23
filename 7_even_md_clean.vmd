@@ -1,0 +1,93 @@
+#!/usr/local/bin/vmd
+# VMD script written by save_state $Revision: 1.44 $
+# VMD version: 1.9.1
+
+##### Load traj
+mol new 7_even_md.xyz waitfor all
+#### Add representations
+mol delrep 0 top
+
+mol representation DynamicBonds 3.500000 0.300000 22.000000
+mol color ColorID 8
+mol selection {all}
+mol material Goodsell
+mol addrep top
+mol selupdate 0 top 0
+mol colupdate 0 top 0
+mol scaleminmax top 0 0.000000 0.000000
+mol smoothrep top 0 0
+mol drawframes top 0 {now}
+
+mol representation VDW 0.500000 27.000000
+mol color ColorID 7
+mol selection {name O}
+mol material Glossy
+mol addrep top
+mol selupdate 1 top 0
+mol colupdate 1 top 0
+mol scaleminmax top 1 0.000000 0.000000
+mol smoothrep top 1 0
+mol drawframes top 1 {now}
+
+mol representation VDW 1.500000 27.000000
+mol color ColorID 0
+mol selection {name H1}
+mol material Glossy
+mol addrep top
+mol selupdate 2 top 0
+mol colupdate 2 top 0
+mol scaleminmax top 2 0.000000 0.000000
+mol smoothrep top 2 0
+mol drawframes top 2 {now}
+
+mol representation VDW 1.500000 27.000000
+mol color ColorID 1
+mol selection {name H2}
+mol material Glossy
+mol addrep top
+mol selupdate 3 top 0
+mol colupdate 3 top 0
+mol scaleminmax top 3 0.000000 0.000000
+mol smoothrep top 3 0
+mol drawframes top 3 {now}
+
+mol representation DynamicBonds 6.000000 0.100000 22.000000
+mol color ColorID 7
+mol selection {all}
+mol material Goodsell
+mol addrep top
+mol selupdate 4 top 0
+mol colupdate 4 top 0
+mol scaleminmax top 4 0.000000 0.000000
+mol smoothrep top 4 0
+mol drawframes top 4 {now}
+
+#mol rename top 7_even_md.xyz
+set viewpoints([molinfo top]) {{{1 0 0 -2.5966} {0 1 0 -9.81253} {0 0 1 -0.63547} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}} {{0.067446 0 0 0} {0 0.067446 0 0} {0 0 0.067446 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+lappend viewplist [molinfo top]
+set topmol [molinfo top]
+#####
+
+##### Load data from data file
+set fp [open "population_7_even.dat" r]
+set population [read $fp]
+close $fp
+set population_list [split $population "\n"]
+
+set mol 0
+set atoms [atomselect $mol all]
+set n [ molinfo $mol get numframes ]
+
+for {set i 0} {$i < $n} {incr i} {
+    $atoms frame $i
+    set pop_atom ""
+    foreach c [$atoms get index] {
+        set pop_frame [split [lindex $population_list $i]]
+        lappend pop_atom [lindex $pop_frame $c]
+    }
+    $atoms set user $pop_atom
+}
+##### define user defined color method
+mol modcolor 1 0 User
+mol modcolor 2 0 User
+mol modcolor 3 0 User
